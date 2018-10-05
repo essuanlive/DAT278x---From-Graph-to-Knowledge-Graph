@@ -1,0 +1,159 @@
+﻿//TODO: Declare the input and output path.
+DECLARE @paramInputDir  string = "/course-kg/input/";
+DECLARE @paramOutputDir string = "/course-kg/output/";
+
+DECLARE @inPaperAuthors string = @paramInputDir + "Paper_authors.tsv";
+DECLARE @outLabOneResults string = @paramOutputDir + "Results_lab_for_module_two_three.tsv";
+
+//Extract paper-author table.
+@paperAuthors =
+    EXTRACT PaperId long, 
+            AuthorId long
+    FROM @inPaperAuthors
+    USING Extractors.Tsv(silent: true, quoting: false);
+ 
+
+//Q1
+//Count the number of papers in the dataset
+@paperCount =
+    SELECT "Q1: #papers" AS CountKey,
+           //Q1: START CODE HERE 
+                                                           
+           //Q1: END CODE HERE
+    FROM @paperAuthors;   
+
+//Q2 
+//Get the number of papers per author
+@authorPaperCount =
+    SELECT AuthorId,
+           COUNT() AS PaperCount
+    FROM @paperAuthors
+    GROUP BY AuthorId;
+
+//Get the average number of papers per author
+@authorAveragePaperCount =
+    SELECT "Q2: average-paper-count-per-author" AS CountKey,
+           //Q2: START CODE HERE
+           
+           //Q2: END CODE HERE
+    FROM @authorPaperCount;
+
+//Q3
+//Get the number of authors of each paper
+@paperAuthorCount =
+    SELECT PaperId,
+           (double?)COUNT() AS AuthorCount
+    FROM @paperAuthors
+    GROUP BY PaperId;
+
+//Get the average number of authors of each paper
+@paperAverageAuthorCount =
+    SELECT "Q3: average-author-count-per-paper" AS CountKey,
+           //Q3: START CODE HERE
+           
+           //Q3: END CODE HERE
+    FROM @paperAuthorCount;
+
+//Q4
+//Link each pair of authors in each paper. 
+@authorPairs =
+    SELECT z.AuthorId AS AuthorA,
+           a.AuthorId AS AuthorB
+    FROM @paperAuthors AS z
+         INNER JOIN
+             @paperAuthors AS a
+         ON z.PaperId == a.PaperId
+    WHERE z.AuthorId < a.AuthorId;
+
+//Count the weight (the number of collaboration times) between each pair of authors.
+@authorPairWeight =
+    SELECT AuthorA,
+           AuthorB,
+           SUM (1.0) AS EdgeWeight
+    FROM @authorPairs
+    //Q4: START CODE HERE
+    GROUP BY AuthorA, AuthorB;
+    //Q4: END CODE HERE
+    
+    
+//Count the number of undirected collaboration links in the graph
+@authorPairCount =
+    SELECT "Q4: #links" AS CountKey,
+           (double?)COUNT() AS CountValue
+    FROM @authorPairWeight;
+
+//Q5
+//Get the largest collaboration times from the network
+@authorPairMaxWeight =
+    SELECT "Q5: maximum collaboration times" AS CountKey,
+           //Q5: START CODE HERE
+           
+           //Q5: END CODE HERE
+    FROM @authorPairWeight;
+
+
+//Q6
+//Get the number of collaborators each author has
+@authorPairReciprocal =
+    SELECT AuthorA AS AuthorOne,
+           AuthorB AS AuthorTwo
+    FROM @authorPairWeight
+    UNION ALL
+    SELECT AuthorB AS AuthorOne,
+           AuthorA AS AuthorTwo
+    FROM @authorPairWeight;
+
+@authorNumNeighbors =
+    SELECT AuthorOne,
+           COUNT() AS NumNeighbors
+    FROM @authorPairReciprocal
+    GROUP BY AuthorOne;
+
+//Count the number of authors in the graph
+@authorCount = 
+    SELECT "Q6: #nodes" AS CountKey, 
+           //Q6: START CODE HERE
+           
+           //Q6: END CODE HERE
+    FROM @authorPairReciprocal;
+
+//Q7
+//Get the average #collaborators of each author
+@authorAverageNeighborCount =
+    SELECT "Q7: average-collaborator-count-per-author" AS CountKey,
+           //Q7: START CODE HERE
+           
+           //Q7: END CODE HERE
+    FROM @authorNumNeighbors;
+
+//Q8
+//Get the #collaborator for one specific author by its ID, e.g., 2114716943 
+@authorNeighborCountById =
+    SELECT "Q8: " + AuthorOne.ToString() AS CountKey,
+           (double?)NumNeighbors AS CountValue
+    FROM @authorNumNeighbors
+    //Q8: START CODE HERE
+    
+    //Q8: END CODE HERE
+
+//Collect all the answers to the 8 questions and ouput them
+@results =
+    SELECT * FROM @paperAverageAuthorCount
+    UNION ALL
+    SELECT * FROM @authorAveragePaperCount
+    UNION ALL
+    SELECT * FROM @paperCount
+    UNION ALL
+    SELECT * FROM @authorPairMaxWeight
+    UNION ALL 
+    SELECT * FROM @authorPairCount
+    UNION ALL
+    SELECT * FROM @authorCount
+    UNION ALL
+    SELECT * FROM @authorAverageNeighborCount
+    UNION ALL
+    SELECT * FROM @authorNeighborCountById;
+         
+OUTPUT @results
+TO @outLabOneResults
+USING Outputters.Tsv(outputHeader: true);
