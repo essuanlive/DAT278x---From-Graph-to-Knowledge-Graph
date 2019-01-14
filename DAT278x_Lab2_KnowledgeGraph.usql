@@ -132,20 +132,21 @@ DECLARE @outLabThreeResults string = @paramOutputDir + "Results_Lab2_KnowledgeGr
 
 
 @results =
-    SELECT * FROM @nodeCounts
+    SELECT Question, (double)Answer FROM @nodeCounts
     UNION ALL 
-    SELECT * FROM @allNodeCount
+    SELECT Question, (double)Answer FROM @allNodeCount
     UNION ALL
-    SELECT * FROM @authorAverageVenueCount
+    SELECT Question, (double)Answer FROM @authorAverageVenueCount
     UNION ALL 
-    SELECT * FROM @venueAverageAuthorCount
+    SELECT Question, (double)Answer FROM @venueAverageAuthorCount
     UNION ALL
-    SELECT * FROM @kddAuthorCount     
+    SELECT Question, (double)Answer FROM @kddAuthorCount     
     UNION ALL 
-    SELECT * FROM @threeVenueAuthorCount;
+    SELECT Question, (double)Answer FROM @threeVenueAuthorCount;
 
 
          
 OUTPUT @results
 TO @outLabThreeResults
+ORDER BY Question
 USING Outputters.Tsv(outputHeader: true);
