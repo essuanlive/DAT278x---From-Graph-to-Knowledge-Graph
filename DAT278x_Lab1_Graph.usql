@@ -3,7 +3,7 @@ DECLARE @paramInputDir  string = "/course-kg/input/";
 DECLARE @paramOutputDir string = "/course-kg/output/";
 
 DECLARE @inPaperAuthors string = @paramInputDir + "Paper_authors.tsv";
-DECLARE @outLabOneResults string = @paramOutputDir + "Results_lab_for_module_two_three.tsv";
+DECLARE @outLabOneResults string = @paramOutputDir + "Results_Lab1_Graph.tsv";
 
 //Extract paper-author table.
 @paperAuthors =
@@ -72,7 +72,7 @@ DECLARE @outLabOneResults string = @paramOutputDir + "Results_lab_for_module_two
            SUM (1.0) AS EdgeWeight
     FROM @authorPairs
     //Q4: START CODE HERE
-    GROUP BY AuthorA, AuthorB;
+
     //Q4: END CODE HERE
     
     
