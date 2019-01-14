@@ -16,7 +16,7 @@ DECLARE @outLabOneResults string = @paramOutputDir + "Results_Lab1_Graph.tsv";
 //Q1
 //Count the number of papers in the dataset
 @paperCount =
-    SELECT "Q1: #papers" AS CountKey,
+    SELECT "Q1: #papers" AS Question,
            //Q1: START CODE HERE 
                                                            
            //Q1: END CODE HERE
@@ -32,7 +32,7 @@ DECLARE @outLabOneResults string = @paramOutputDir + "Results_Lab1_Graph.tsv";
 
 //Get the average number of papers per author
 @authorAveragePaperCount =
-    SELECT "Q2: average-paper-count-per-author" AS CountKey,
+    SELECT "Q2: average-paper-count-per-author" AS Question,
            //Q2: START CODE HERE
            
            //Q2: END CODE HERE
@@ -48,7 +48,7 @@ DECLARE @outLabOneResults string = @paramOutputDir + "Results_Lab1_Graph.tsv";
 
 //Get the average number of authors of each paper
 @paperAverageAuthorCount =
-    SELECT "Q3: average-author-count-per-paper" AS CountKey,
+    SELECT "Q3: average-author-count-per-paper" AS Question,
            //Q3: START CODE HERE
            
            //Q3: END CODE HERE
@@ -78,14 +78,14 @@ DECLARE @outLabOneResults string = @paramOutputDir + "Results_Lab1_Graph.tsv";
     
 //Count the number of undirected collaboration links in the graph
 @authorPairCount =
-    SELECT "Q4: #links" AS CountKey,
-           (double?)COUNT() AS CountValue
+    SELECT "Q4: #links" AS Question,
+           (double?)COUNT() AS Answer
     FROM @authorPairWeight;
 
 //Q5
 //Get the largest collaboration times from the network
 @authorPairMaxWeight =
-    SELECT "Q5: maximum collaboration times" AS CountKey,
+    SELECT "Q5: maximum collaboration times" AS Question,
            //Q5: START CODE HERE
            
            //Q5: END CODE HERE
@@ -111,7 +111,7 @@ DECLARE @outLabOneResults string = @paramOutputDir + "Results_Lab1_Graph.tsv";
 
 //Count the number of authors in the graph
 @authorCount = 
-    SELECT "Q6: #nodes" AS CountKey, 
+    SELECT "Q6: #nodes" AS Question, 
            //Q6: START CODE HERE
            
            //Q6: END CODE HERE
@@ -120,7 +120,7 @@ DECLARE @outLabOneResults string = @paramOutputDir + "Results_Lab1_Graph.tsv";
 //Q7
 //Get the average #collaborators of each author
 @authorAverageNeighborCount =
-    SELECT "Q7: average-collaborator-count-per-author" AS CountKey,
+    SELECT "Q7: average-collaborator-count-per-author" AS Question,
            //Q7: START CODE HERE
            
            //Q7: END CODE HERE
@@ -129,8 +129,8 @@ DECLARE @outLabOneResults string = @paramOutputDir + "Results_Lab1_Graph.tsv";
 //Q8
 //Get the #collaborator for one specific author by its ID, e.g., 2114716943 
 @authorNeighborCountById =
-    SELECT "Q8: " + AuthorOne.ToString() AS CountKey,
-           (double?)NumNeighbors AS CountValue
+    SELECT "Q8: " + AuthorOne.ToString() AS Question,
+           (double?)NumNeighbors AS Answer
     FROM @authorNumNeighbors
     //Q8: START CODE HERE
     
@@ -138,22 +138,23 @@ DECLARE @outLabOneResults string = @paramOutputDir + "Results_Lab1_Graph.tsv";
 
 //Collect all the answers to the 8 questions and ouput them
 @results =
-    SELECT * FROM @paperAverageAuthorCount
+    SELECT Question, (double)Answer FROM @paperAverageAuthorCount
     UNION ALL
-    SELECT * FROM @authorAveragePaperCount
+    SELECT Question, (double)Answer FROM @authorAveragePaperCount
     UNION ALL
-    SELECT * FROM @paperCount
+    SELECT Question, (double)Answer FROM @paperCount
     UNION ALL
-    SELECT * FROM @authorPairMaxWeight
+    SELECT Question, (double)Answer FROM @authorPairMaxWeight
     UNION ALL 
-    SELECT * FROM @authorPairCount
+    SELECT Question, (double)Answer FROM @authorPairCount
     UNION ALL
-    SELECT * FROM @authorCount
+    SELECT Question, (double)Answer FROM @authorCount
     UNION ALL
-    SELECT * FROM @authorAverageNeighborCount
+    SELECT Question, (double)Answer FROM @authorAverageNeighborCount
     UNION ALL
-    SELECT * FROM @authorNeighborCountById;
+    SELECT Question, (double)Answer FROM @authorNeighborCountById;
          
 OUTPUT @results
 TO @outLabOneResults
+ORDER BY Question
 USING Outputters.Tsv(outputHeader: true);
