@@ -38,15 +38,15 @@ DECLARE @outLabThreeResults string = @paramOutputDir + "Results_Lab2_KnowledgeGr
 //Count the number of papers, authors, and venues in the paper-author-venue triples
 @nodeCounts = 
     SELECT "Q1: #papers in the triple set" AS Question,
-           (double?)COUNT(DISTINCT PaperId) AS Answer
+           COUNT(DISTINCT PaperId) AS Answer
     FROM @paperAuthorVenue
     UNION ALL
     SELECT "Q2: #authors in the triple set" AS Question, 
-           (double?)COUNT(DISTINCT AuthorId) AS Answer
+           COUNT(DISTINCT AuthorId) AS Answer
     FROM @paperAuthorVenue
     UNION ALL
     SELECT "Q3: #venues in the triple set" AS Question,
-           (double?)COUNT(DISTINCT VenueName) AS Answer
+           COUNT(DISTINCT VenueName) AS Answer
     FROM @paperAuthorVenue;
 
 //Q4
@@ -93,7 +93,7 @@ DECLARE @outLabThreeResults string = @paramOutputDir + "Results_Lab2_KnowledgeGr
 //Get the number of authors that KDD has
 @kddAuthorCount = 
     SELECT "Q8: #authors that KDD has" AS Question,
-           (double?)NumAuthors AS Answer
+           NumAuthors AS Answer
     FROM @venueAuthorCount
     //Q8: START CODE HERE
      
@@ -125,7 +125,7 @@ DECLARE @outLabThreeResults string = @paramOutputDir + "Results_Lab2_KnowledgeGr
 
 @threeVenueAuthorCount = 
     SELECT "Q9: #authors that publish at KDD, ICML, and IJCAI" AS Question, 
-           (double?)NumAuthors AS Answer
+           NumAuthors AS Answer
     FROM @numVenueAuthorCount
     WHERE NumVenues == 3;
 
