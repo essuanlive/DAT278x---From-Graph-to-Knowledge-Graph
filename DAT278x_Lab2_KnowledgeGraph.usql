@@ -5,7 +5,7 @@ DECLARE @paramOutputDir string = "/course-kg/output/";
 DECLARE @inPaperAuthors string = @paramInputDir + "Paper_authors.tsv";
 DECLARE @inPaperVenue string = @paramInputDir + "Paper_venue.tsv";
 
-DECLARE @outLabThreeResults string = @paramOutputDir + "Results_lab_for_module_four_five.tsv";
+DECLARE @outLabThreeResults string = @paramOutputDir + "Results_Lab2_KnowledgeGraph.tsv";
 
 
 //Extract paper-author table.
@@ -22,7 +22,7 @@ DECLARE @outLabThreeResults string = @paramOutputDir + "Results_lab_for_module_f
     USING Extractors.Tsv(silent: true, quoting: false);
 
 
-//Q1--3
+//Q1--Q3
 //Connect paper-author link with paper-venue link to get paper-author-venue triples
 @paperAuthorVenue =
     SELECT z.PaperId,
@@ -37,21 +37,21 @@ DECLARE @outLabThreeResults string = @paramOutputDir + "Results_lab_for_module_f
 
 //Count the number of papers, authors, and venues in the paper-author-venue triples
 @nodeCounts = 
-    SELECT "Q1: #papers in the triple set" AS CountKey,
-           (double?)COUNT(DISTINCT PaperId) AS CountValue
+    SELECT "Q1: #papers in the triple set" AS Question,
+           (double?)COUNT(DISTINCT PaperId) AS Answer
     FROM @paperAuthorVenue
     UNION ALL
-    SELECT "Q2: #authors in the triple set" AS CountKey, 
-           (double?)COUNT(DISTINCT AuthorId) AS CountValue
+    SELECT "Q2: #authors in the triple set" AS Question, 
+           (double?)COUNT(DISTINCT AuthorId) AS Answer
     FROM @paperAuthorVenue
     UNION ALL
-    SELECT "Q3: #venues in the triple set" AS CountKey,
-           (double?)COUNT(DISTINCT VenueName) AS CountValue
+    SELECT "Q3: #venues in the triple set" AS Question,
+           (double?)COUNT(DISTINCT VenueName) AS Answer
     FROM @paperAuthorVenue;
 
 //Q4
 @allNodeCount = 
-    SELECT "Q4: #nodes in the triple set" AS CountKey, 
+    SELECT "Q4: #nodes in the triple set" AS Question, 
            //Q4: START CODE HERE
             
            //Q4: END CODE HERE
@@ -66,7 +66,7 @@ DECLARE @outLabThreeResults string = @paramOutputDir + "Results_lab_for_module_f
     GROUP BY AuthorId;
 
 @authorAverageVenueCount =
-    SELECT "Q5: average #venues that each author publishes at" AS CountKey,
+    SELECT "Q5: average #venues that each author publishes at" AS Question,
            //Q5: START CODE HERE
             
            //Q5: END CODE HERE
@@ -82,7 +82,7 @@ DECLARE @outLabThreeResults string = @paramOutputDir + "Results_lab_for_module_f
     GROUP BY VenueName;
 
 @venueAverageAuthorCount =
-    SELECT "Q7: average #authors that each venue has" AS CountKey,
+    SELECT "Q7: average #authors that each venue has" AS Question,
            //Q6: START CODE HERE
             
            //Q6: END CODE HERE
@@ -92,8 +92,8 @@ DECLARE @outLabThreeResults string = @paramOutputDir + "Results_lab_for_module_f
 //Q8
 //Get the number of authors that KDD has
 @kddAuthorCount = 
-    SELECT "Q8: #authors that KDD has" AS CountKey,
-           (double?)NumAuthors AS CountValue
+    SELECT "Q8: #authors that KDD has" AS Question,
+           (double?)NumAuthors AS Answer
     FROM @venueAuthorCount
     //Q8: START CODE HERE
      
@@ -124,8 +124,8 @@ DECLARE @outLabThreeResults string = @paramOutputDir + "Results_lab_for_module_f
     GROUP BY NumVenues;
 
 @threeVenueAuthorCount = 
-    SELECT "Q9: #authors that publish at KDD, ICML, and IJCAI" AS CountKey, 
-           (double?)NumAuthors AS CountValue
+    SELECT "Q9: #authors that publish at KDD, ICML, and IJCAI" AS Question, 
+           (double?)NumAuthors AS Answer
     FROM @numVenueAuthorCount
     WHERE NumVenues == 3;
 
