@@ -42,7 +42,7 @@ DECLARE @outLabOneResults string = @paramOutputDir + "Results_Lab1_Graph.tsv";
 //Get the number of authors of each paper
 @paperAuthorCount =
     SELECT PaperId,
-           (double?)COUNT() AS AuthorCount
+           COUNT() AS AuthorCount
     FROM @paperAuthors
     GROUP BY PaperId;
 
@@ -69,7 +69,7 @@ DECLARE @outLabOneResults string = @paramOutputDir + "Results_Lab1_Graph.tsv";
 @authorPairWeight =
     SELECT AuthorA,
            AuthorB,
-           SUM (1.0) AS EdgeWeight
+           COUNT() AS EdgeWeight
     FROM @authorPairs
     //Q4: START CODE HERE
 
@@ -79,7 +79,7 @@ DECLARE @outLabOneResults string = @paramOutputDir + "Results_Lab1_Graph.tsv";
 //Count the number of undirected collaboration links in the graph
 @authorPairCount =
     SELECT "Q4: #links" AS Question,
-           (double?)COUNT() AS Answer
+           COUNT() AS Answer
     FROM @authorPairWeight;
 
 //Q5
@@ -130,7 +130,7 @@ DECLARE @outLabOneResults string = @paramOutputDir + "Results_Lab1_Graph.tsv";
 //Get the #collaborator for one specific author by its ID, e.g., 2114716943 
 @authorNeighborCountById =
     SELECT "Q8: " + AuthorOne.ToString() AS Question,
-           (double?)NumNeighbors AS Answer
+           NumNeighbors AS Answer
     FROM @authorNumNeighbors
     //Q8: START CODE HERE
     
