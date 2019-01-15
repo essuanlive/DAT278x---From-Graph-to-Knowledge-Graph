@@ -1,0 +1,42 @@
+//This is the smoke test USQL script for EdX DAT278x Challenge Lab steup
+//TODO: Declare the input and output path.
+DECLARE @paramInputDir  string = "/course-kg/input/";
+DECLARE @paramOutputDir string = "/course-kg/output/";
+
+DECLARE @inPaperAuthors string = @paramInputDir + "Paper_authors.tsv";
+DECLARE @inPaperVenue string = @paramInputDir + "Paper_venue.tsv";
+
+DECLARE @outSmokeTestResults string = @paramOutputDir + "Results_DAT278x_SmokeTest.tsv";
+
+//Extract paper-author table.
+@paperAuthors =
+    EXTRACT PaperId long, 
+            AuthorId long
+    FROM @inPaperAuthors
+    USING Extractors.Tsv(silent: true, quoting: false);
+
+@paperVenue = 
+    EXTRACT PaperId long, 
+            VenueName string
+    FROM @inPaperVenue
+    USING Extractors.Tsv(silent: true, quoting: false);
+
+@paperAuthorRowCnt = 
+    SELECT  "01-PaperAuthors" AS FileName,
+            COUNT(1) AS RowCnt
+    FROM @paperAuthors;
+
+@paperVenueRowCnt = 
+    SELECT  "02-PaperVenue" AS FileName,
+            COUNT(1) AS RowCnt
+    FROM @paperVenue;
+
+@results =
+    SELECT FileName, RowCnt FROM @paperAuthorRowCnt
+    UNION ALL 
+    SELECT FileName, RowCnt FROM @paperVenueRowCnt;
+
+OUTPUT @results
+TO @outSmokeTestResults
+ORDER BY FileName
+USING Outputters.Tsv(outputHeader: true);
