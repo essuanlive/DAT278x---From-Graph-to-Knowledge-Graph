@@ -1,5 +1,6 @@
-//This is the smoke test USQL script for EdX DAT278x Challenge Lab steup
-//TODO: Declare the input and output path.
+//This is the smoke test U-SQL script for EdX DAT278x Challenge Lab steup
+
+//Declare the input and output path.
 DECLARE @paramInputDir  string = "/course-kg/input/";
 DECLARE @paramOutputDir string = "/course-kg/output/";
 
