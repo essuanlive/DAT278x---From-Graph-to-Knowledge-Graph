@@ -1,0 +1,162 @@
+﻿//This is the U-SQL script for EdX DAT278x Challenge Lab 1 on Graph
+
+//Declare the input and output path.
+DECLARE @paramInputDir  string = "/course-kg/input/";
+DECLARE @paramOutputDir string = "/course-kg/output/";
+
+DECLARE @inPaperAuthors string = @paramInputDir + "Paper_authors.tsv";
+DECLARE @outLabOneResults string = @paramOutputDir + "Results_Lab1_Graph.tsv";
+
+//Extract paper-author table.
+@paperAuthors =
+    EXTRACT PaperId long, 
+            AuthorId long
+    FROM @inPaperAuthors
+    USING Extractors.Tsv(silent: true, quoting: false);
+ 
+
+//Q1
+//Count the number of papers in the dataset
+@paperCount =
+    SELECT "Q1: #papers" AS Question,
+           //Q1: START CODE HERE 
+                                                           
+           //Q1: END CODE HERE
+    FROM @paperAuthors;   
+
+//Q2 
+//Get the number of papers per author
+@authorPaperCount =
+    SELECT AuthorId,
+           COUNT() AS PaperCount
+    FROM @paperAuthors
+    GROUP BY AuthorId;
+
+//Get the average number of papers per author
+@authorAveragePaperCount =
+    SELECT "Q2: average-paper-count-per-author" AS Question,
+           //Q2: START CODE HERE
+           
+           //Q2: END CODE HERE
+    FROM @authorPaperCount;
+
+//Q3
+//Get the number of authors of each paper
+@paperAuthorCount =
+    SELECT PaperId,
+           COUNT() AS AuthorCount
+    FROM @paperAuthors
+    GROUP BY PaperId;
+
+//Get the average number of authors of each paper
+@paperAverageAuthorCount =
+    SELECT "Q3: average-author-count-per-paper" AS Question,
+           //Q3: START CODE HERE
+           
+           //Q3: END CODE HERE
+    FROM @paperAuthorCount;
+
+//Q4
+//Link each pair of authors in each paper. 
+@authorPairs =
+    SELECT z.AuthorId AS AuthorA,
+           a.AuthorId AS AuthorB
+    FROM @paperAuthors AS z
+         INNER JOIN
+             @paperAuthors AS a
+         ON z.PaperId == a.PaperId
+    WHERE z.AuthorId < a.AuthorId;
+
+//Count the weight (the number of collaboration times) between each pair of authors.
+@authorPairWeight =
+    SELECT AuthorA,
+           AuthorB,
+           COUNT() AS EdgeWeight
+    FROM @authorPairs
+    //Q4: START CODE HERE
+
+    //Q4: END CODE HERE
+    
+    
+//Count the number of undirected collaboration links in the graph
+@authorPairCount =
+    SELECT "Q4: #links" AS Question,
+           COUNT() AS Answer
+    FROM @authorPairWeight;
+
+//Q5
+//Get the largest collaboration times from the network
+@authorPairMaxWeight =
+    SELECT "Q5: maximum collaboration times" AS Question,
+           //Q5: START CODE HERE
+           
+           //Q5: END CODE HERE
+    FROM @authorPairWeight;
+
+
+//Q6
+//Get the number of collaborators each author has
+@authorPairReciprocal =
+    SELECT AuthorA AS AuthorOne,
+           AuthorB AS AuthorTwo
+    FROM @authorPairWeight
+    UNION ALL
+    SELECT AuthorB AS AuthorOne,
+           AuthorA AS AuthorTwo
+    FROM @authorPairWeight;
+
+@authorNumNeighbors =
+    SELECT AuthorOne,
+           COUNT() AS NumNeighbors
+    FROM @authorPairReciprocal
+    GROUP BY AuthorOne;
+
+//Count the number of authors in the graph
+@authorCount = 
+    SELECT "Q6: #nodes" AS Question, 
+           //Q6: START CODE HERE
+           
+           //Q6: END CODE HERE
+    FROM @authorPairReciprocal;
+
+//Q7
+//Get the average #collaborators of each author
+@authorAverageNeighborCount =
+    SELECT "Q7: average-collaborator-count-per-author" AS Question,
+           //Q7: START CODE HERE
+           
+           //Q7: END CODE HERE
+    FROM @authorNumNeighbors;
+
+//Q8
+//Get the #collaborator for one specific author by its ID, e.g., 2114716943 
+@authorNeighborCountById =
+    SELECT "Q8: " + AuthorOne.ToString() AS Question,
+           NumNeighbors AS Answer
+    FROM @authorNumNeighbors
+    //Q8: START CODE HERE
+    
+    //Q8: END CODE HERE
+
+//Collect all the answers to the 8 questions and ouput them
+@results =
+    SELECT Question, (double)Answer AS Answer FROM @paperAverageAuthorCount
+    UNION ALL
+    SELECT Question, (double)Answer AS Answer FROM @authorAveragePaperCount
+    UNION ALL
+    SELECT Question, (double)Answer AS Answer FROM @paperCount
+    UNION ALL
+    SELECT Question, (double)Answer AS Answer FROM @authorPairMaxWeight
+    UNION ALL 
+    SELECT Question, (double)Answer AS Answer FROM @authorPairCount
+    UNION ALL
+    SELECT Question, (double)Answer AS Answer FROM @authorCount
+    UNION ALL
+    SELECT Question, (double)Answer AS Answer FROM @authorAverageNeighborCount
+    UNION ALL
+    SELECT Question, (double)Answer AS Answer FROM @authorNeighborCountById;
+         
+OUTPUT @results
+TO @outLabOneResults
+ORDER BY Question
+USING Outputters.Tsv(outputHeader: true);
